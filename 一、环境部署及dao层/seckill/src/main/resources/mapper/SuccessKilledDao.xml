@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.orzlinux.dao.SuccessKilledDao">
+    <!--为DAO接口方法提供sql语句配置-->
+    <!--int insertSuccessKilled(long seckillId,long userPhone);-->
+    <insert id="insertSuccessKilled">
+        <!-- 主键冲突，报错
+        INSERT IGNORE 与INSERT INTO的区别就是INSERT IGNORE会忽略数
+        据库中已经存在 的数据，如果数据库没有数据，就插入新的数据，如果有数
+        据的话就跳过这条数据。-->
+        insert ignore into success_killed(seckill_id,user_phone,state)
+        values (#{seckillId},#{userPhone},0)
+    </insert>
+    
+    <!--SuccessKilled queryByIdWithSeckill(long seckillId,long userPhone);-->
+    <select id="queryByIdWithSeckill" resultType="SuccessKilled">
+        <!-- 根据查询携带seckill实体
+         如何告诉mybatis把结果映射到SuccessKilled同时映射seckill
+         可以自由控制SQL-->
+        select
+            sk.seckill_id,
+            sk.user_phone,
+            sk.create_time,
+            sk.state,
+            s.seckill_id as "secKill.seckill_id", #开启了驼峰，会自动换
+            s.name "secKill.name",
+            s.number "secKill.number",
+            s.start_time "secKill.start_time",
+            s.end_time "secKill.end_time",
+            s.create_time "secKill.create_time"
+        from success_killed sk
+        inner join seckill s on sk.seckill_id = s.seckill_id
+        where sk.seckill_id = #{seckillId} and sk.user_phone = #{userPhone};
+    </select>
+
+</mapper>
